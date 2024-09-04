@@ -3,20 +3,22 @@ package study.advanced.app.v5_strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import study.advanced.trace.logtrace.LogTrace;
-import study.advanced.trace.strategy.ContextV1;
-import study.advanced.trace.template.AbstractTemplate;
+import study.advanced.trace.strategy.TraceTemplate;
 
 @Repository
-@RequiredArgsConstructor
 public class OrderRepositoryV5 {
+    private final TraceTemplate template;
 
-    private final LogTrace trace;
+    public OrderRepositoryV5(LogTrace trace) {
+        this.template = new TraceTemplate(trace);
+    }
 
     public void save(String itemId) {
-        new ContextV1<Void>(trace).execute(() -> {
+        template.execute("OrderRepository.save()", () -> {
             if(itemId.equals("ex")) throw new IllegalStateException("예외 발생!");
             sleep(1000);
-        },"OrderRepository.save()");
+            return null;
+        });
     }
 
     private void sleep(int millis) {
